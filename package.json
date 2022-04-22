@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@chainlink/contracts": "^0.4.0",
     "@openzeppelin/contracts": "^4.5.0",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.4",
@@ -14,7 +15,9 @@
     "react-scripts": "5.0.0",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.1",
-    "web-vitals": "^2.1.4"
+    "util": "^0.12.4",
+    "web-vitals": "^2.1.4",
+    "webpack": "^5.72.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -44,6 +47,6 @@
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "chai": "^4.3.6",
     "ethereum-waffle": "^3.4.0",
-    "hardhat": "^2.9.1"
+    "hardhat": "^2.9.3"
   }
 }

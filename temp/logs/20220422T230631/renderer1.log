@@ -1,0 +1,20 @@
+[2022-04-22 23:06:37.692] [renderer1] [info] Ignoring configured affinity for 'pub.name' because the extension is unknown or cannot execute.
+[2022-04-22 23:06:38.630] [renderer1] [error] ["Error: Unknown or unsupported transport “disabled” for address “disabled:”"]
+[2022-04-22 23:06:38.631] [renderer1] [warning] Settings Sync: Accounts are not initialized
+[2022-04-22 23:06:38.677] [renderer1] [info] Ignoring configured affinity for 'pub.name' because the extension is unknown or cannot execute.
+[2022-04-22 23:06:41.290] [renderer1] [info] Ignoring configured affinity for 'pub.name' because the extension is unknown or cannot execute.
+[2022-04-22 23:14:00.258] [renderer1] [info] Ignoring configured affinity for 'pub.name' because the extension is unknown or cannot execute.
+[2022-04-22 23:14:01.528] [renderer1] [error] ["Error: Unknown or unsupported transport “disabled” for address “disabled:”"]
+[2022-04-22 23:14:01.530] [renderer1] [warning] Settings Sync: Accounts are not initialized
+[2022-04-22 23:14:01.783] [renderer1] [info] Ignoring configured affinity for 'pub.name' because the extension is unknown or cannot execute.
+[2022-04-22 23:14:02.526] [renderer1] [info] Ignoring configured affinity for 'pub.name' because the extension is unknown or cannot execute.
+[2022-04-22 23:14:13.456] [renderer1] [info] UNRESPONSIVE extension host: starting to profile NOW
+[2022-04-22 23:14:17.595] [renderer1] [info] UNRESPONSIVE extension host: received responsive event and cancelling profiling session
+[2022-04-22 23:14:19.935] [renderer1] [warning] UNRESPONSIVE extension host: 'JuanBlanco.solidity' took 95% of 4746.894ms, saved PROFILE here: 'file:///tmp/exthost-02cfe4.cpuprofile' [{"id":"gc","total":117302,"percentage":2},{"id":"JuanBlanco.solidity","total":4507694,"percentage":95},{"id":"self","total":52575,"percentage":1},{"id":"vscode.git","total":68925,"percentage":1}]
+[2022-04-22 23:14:44.688] [renderer1] [info] UNRESPONSIVE extension host: starting to profile NOW
+[2022-04-22 23:14:45.229] [renderer1] [info] UNRESPONSIVE extension host: received responsive event and cancelling profiling session
+[2022-04-22 23:14:54.095] [renderer1] [info] UNRESPONSIVE extension host: received responsive event and cancelling profiling session
+[2022-04-22 23:14:56.537] [renderer1] [info] UNRESPONSIVE extension host: starting to profile NOW
+[2022-04-22 23:15:02.191] [renderer1] [info] UNRESPONSIVE extension host: starting to profile NOW
+[2022-04-22 23:15:03.725] [renderer1] [info] UNRESPONSIVE extension host: received responsive event and cancelling profiling session
+[2022-04-22 23:15:04.832] [renderer1] [warning] UNRESPONSIVE extension host: 'vscode.git' took 80% of 3911.393ms, saved PROFILE here: 'file:///tmp/exthost-a9bdc0.cpuprofile' [{"id":"gc","total":25856,"percentage":1},{"id":"JuanBlanco.solidity","total":53375,"percentage":1},{"id":"program","total":5970,"percentage":0},{"id":"self","total":223471,"percentage":6},{"id":"vscode.git","total":3115152,"percentage":80},{"id":"vscode.npm","total":16286,"percentage":0},{"id":"vscode.typescript-language-features","total":470977,"percentage":12}]

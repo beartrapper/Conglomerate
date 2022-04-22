@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+// require("@chainlink/contracts");
 // require('@openzeppelin/contracts');
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -18,19 +19,23 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 
-const ALCHEMY_URL = "https://eth-rinkeby.alchemyapi.io/v2/joVQfefvPkiFxuh5Nqs2SJAdbR_W19gf";
-const PRIVATE_KEY = "4e1088ecc9e62e2bfcdf64d49a1321bf82786eb2666e4274e0bff65de1f8b2e7";
+const ALCHEMY_URL =
+  "https://eth-rinkeby.alchemyapi.io/v2/joVQfefvPkiFxuh5Nqs2SJAdbR_W19gf";
+const PRIVATE_KEY =
+  "77d066f701150e338a6e541478ce2351521788907b9b9fcbdb26c4cb4334e7a1";
 
 module.exports = {
   networks: {
     rinkeby: {
       url: ALCHEMY_URL,
-      accounts: [`0x${PRIVATE_KEY}`]
+      accounts: [`0x${PRIVATE_KEY}`],
     },
     localhost: {
       url: "http://localhost:8545/",
-      accounts: ["0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"]
-    }
+      accounts: [
+        "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+      ],
+    },
   },
   solidity: "0.8.4",
 };
