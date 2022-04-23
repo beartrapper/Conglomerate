@@ -4,15 +4,15 @@ pragma solidity ^0.8.0;
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract PredictionMarket {
-
-    constructor (){
+    constructor() {
         owner = msg.sender;
 
         //rinkeby network address addded
-        priceFeed = AggregatorV3Interface(0x8A753747A1Fa494EC906cE90E9f37563A8AF630e);
-
+        priceFeed = AggregatorV3Interface(
+            0x8A753747A1Fa494EC906cE90E9f37563A8AF630e
+        );
     }
-    
+
     // DB
     // minimumValue to be deposited
     uint256 public minValueToBeDeposited;
@@ -49,27 +49,26 @@ contract PredictionMarket {
     mapping(address => uint256) public playerBalances;
 
     // array of all players indicating history of players
-    mapping(address => Transaction[]) public transactionHistory;
+    mapping(address => mapping(uint32 => Transaction))
+        public transactionHistory;
 
-    //reference number for bets
-    mapping (address => uint32) public numberOfBets;
+    mapping(address => uint32) public numberOfBets;
 
     AggregatorV3Interface internal priceFeed;
 
     //MODIFIERS
     //only owner can call a certain function
-    modifier _onlyOwner(){
+    modifier _onlyOwner() {
         require(msg.sender == owner);
         _;
     }
 
     // FUNCTIONS
     // deposit for bet
-    function depositForBet(BetType _betType) public payable{
-
+    function depositForBet(BetType _betType) public payable {
         //checking if the money sent is enough
         require(msg.value > minValueToBeDeposited, "is this a joke to you?");
-        
+
         //update the player's balance
         playerBalances[msg.sender] += msg.value;
 
@@ -91,70 +90,27 @@ contract PredictionMarket {
             BetResult.PENDING
         );
 
-        //pushing in the object in array
-        transactionHistory[msg.sender].push(currentTx);
+        //updating the db
+        transactionHistory[msg.sender][numberOfBets[msg.sender]] = currentTx;
 
-        //can use array.length too
-        numberOfBets[msg.sender]++;
+        //add to the total number of bets
+        //dunno why but this might be useful in the future
+        //why not code it then, you ask?
+        //idk, shataap.
+        ++numberOfBets[msg.sender]; // smol gas saver, weeeee
     }
-
-    // function finalizeBet() public{
-    //     //get the latest/current tx
-    //     Transaction memory txHolder = transactionHistory[msg.sender][numberOfBets[msg.sender]];
-
-    //     //get the price from chainlink
-    //     uint256 endingPriceForBet = uint256(getLatestPrice());
-        
-    //     //assign ending value to the tx
-    //     txHolder.endingValue = endingPriceForBet;
-
-    //     //check if someone's being naughty
-    //     require(block.timestamp >= txHolder.endingTime, "naughty naughty, you.");
-
-    //     //determine with if
-
-    //     //BULL CASE
-    //     if(txHolder.betType == BetType.BULL){
-    //         if(txHolder.startingValue <= txHolder.endingValue){
-    //             //update the db
-    //             txHolder.betResult = BetResult.WON;
-    //         } else {
-    //             //update the db
-    //             txHolder.betResult = BetResult.LOST;
-    //             playerBalances[msg.sender] = 0;
-    //         }
-    //     }
-
-    //     //BEAR CASE
-    //     if(txHolder.betType == BetType.BEAR){
-    //         if(txHolder.startingValue >= txHolder.endingValue){
-    //             //update the db
-    //             txHolder.betResult = BetResult.WON;
-    //         } else {
-    //             //update the db
-    //             txHolder.betResult = BetResult.LOST;
-    //             playerBalances[msg.sender] = 0;
-    //         }
-    //     }
-        
-        
-    //     //return a message of some sort
-
-    // }
 
     // get value for checking(chainlink)
-    function getLatestPrice() public view returns (int){
-        
+    function getLatestPrice() public view returns (int256) {
         //latest round data returns a tuple with with multiple values
-        (,int price, , ,) = priceFeed.latestRoundData();
+        (, int256 price, , , ) = priceFeed.latestRoundData();
         return price;
     }
-
 
     // withdraw from contract(only owner)
 
     //get contract's balance back
-    function getContractBalance() public view returns (uint256){
+    function getContractBalance() public view returns (uint256) {
         return address(this).balance;
     }
 
@@ -163,31 +119,50 @@ contract PredictionMarket {
         minValueToBeDeposited = _value;
     }
 
-    //will have to do multiple calls to get all tx data instead choosing a function to do it 
-    function getUserTxHistory(address _user) public view returns (Transaction[] memory){
+    function finalizeBet(uint32 betNumber) public {
+        //get the latest/current tx
+        Transaction memory txHolder = transactionHistory[msg.sender][betNumber];
 
-        // declaring a holder array
-        Transaction[] memory holderArray = new Transaction[](numberOfBets[_user]);
-        // Transaction memory txHolder; 
-        holderArray = transactionHistory[_user];
-        // txHolder = holderArray[numberOfBets[_user]];
+        //check if someone's being naughty
+        require(
+            block.timestamp >= txHolder.endingTime,
+            "naughty naughty, you."
+        );
 
-        // // looping over the original and getting all the values out into the holder array
-        // for(uint32 counter = 0; counter < numberOfBets[_user]; counter++){
+        //get the price from chainlink
+        uint256 endingPriceForBet = uint256(getLatestPrice());
 
-        //     //convert to storage for some reason
-        //     //idk why, ask stackoverflow guys
-        //     Transaction storage holderElement = transactionHistory[_user][counter];
+        //assign ending value to the tx
+        txHolder.endingValue = endingPriceForBet;
 
-        //     //getting the value from the original aarray
-        //     //push it into the holder array
-        //     holderArray[counter] = holderElement;
-        // }
+        //determine with if
 
-        // // return holder array
-        return holderArray;
-        // return txHolder;
-        
+        //BULL CASE
+        if (txHolder.betType == BetType.BULL) {
+            if (txHolder.startingValue <= txHolder.endingValue) {
+                //update the db
+                txHolder.betResult = BetResult.WON;
+            } else {
+                //update the db
+                txHolder.betResult = BetResult.LOST;
+                playerBalances[msg.sender] = 0;
+            }
+        }
+
+        //BEAR CASE
+        if (txHolder.betType == BetType.BEAR) {
+            if (txHolder.startingValue >= txHolder.endingValue) {
+                //update the db
+                txHolder.betResult = BetResult.WON;
+            } else {
+                //update the db
+                txHolder.betResult = BetResult.LOST;
+                playerBalances[msg.sender] = 0;
+            }
+        }
+
+        transactionHistory[msg.sender][betNumber] = txHolder;
+
+        //return a message of some sort
     }
-
 }

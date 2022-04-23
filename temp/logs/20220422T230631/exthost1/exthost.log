@@ -256,3 +256,14 @@
 	at X.resolveCompletionItem (/usr/share/code/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:85:109706)
 	at runMicrotasks (<anonymous>)
 	at processTicksAndRejections (node:internal/process/task_queues:96:5)
+[2022-04-23 23:42:54.402] [exthost] [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+[2022-04-24 00:26:35.526] [exthost] [error] [vscode.typescript-language-features] provider FAILED
+[2022-04-24 00:26:35.527] [exthost] [error] Error: DisposableStore is missing...
+	at X._convertCompletionItem (/usr/share/code/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:85:109928)
+	at X.resolveCompletionItem (/usr/share/code/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:85:109706)
+	at runMicrotasks (<anonymous>)
+	at processTicksAndRejections (node:internal/process/task_queues:96:5)
+[2022-04-24 05:14:56.144] [exthost] [warning] [Decorations] CAPPING events from decorations provider vscode.git 305
+[2022-04-24 05:15:01.408] [exthost] [warning] [Decorations] CAPPING events from decorations provider vscode.git 305
+[2022-04-24 05:15:06.696] [exthost] [warning] [Decorations] CAPPING events from decorations provider vscode.git 305
+[2022-04-24 05:15:11.955] [exthost] [warning] [Decorations] CAPPING events from decorations provider vscode.git 305

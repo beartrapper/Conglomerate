@@ -13,6 +13,15 @@ export const UserHistory = (props) => {
   const address = props.address;
 
   useEffect(() => {
+    contract
+      .transactionHistory(address, 2)
+      .then((res) => {
+        console.log("adddress tx hostpr: ", res);
+      })
+      .catch((err) => {
+        console.log("err fetching tx history: ", err);
+      });
+
     const payload = {
       contract,
       address,
@@ -20,16 +29,6 @@ export const UserHistory = (props) => {
 
     dispatch(fetchUserHistory(payload));
   }, []);
-
-  //this should be inside a helper functions directory
-  function hex_to_ascii(str1) {
-    var hex = str1.toString();
-    var str = "";
-    for (var n = 0; n < hex.length; n += 2) {
-      str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
-    }
-    return str;
-  }
 
   return (
     <div>
