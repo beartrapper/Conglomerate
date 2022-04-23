@@ -3,38 +3,47 @@
 //makes you not lose your sanity
 
 import { ethers } from "ethers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { fetchUserHistory } from "../../../state/PredictionMarket/actions/fetchUserHistory";
+import { makeABet } from "../../../state/PredictionMarket/actions/makeABet";
 
 export const MakeABet = (props) => {
   const contract = props.contract;
+  const address = props.address;
   const [ethValue, setEthValue] = useState("");
 
   const dispatch = useDispatch();
 
   const onChangeEthValue = (e) => {
-    setEthValue(e.target.value);
+    let _val = e.target.value.toString();
+    setEthValue(_val);
   };
 
-  const placeBet = async () => {
-    const options = { value: ethers.utils.parseEther("0.001") };
-    contract.depositForBet(0, options).
-    then(res => {
-      console.log(res)
-    })
-    .catch(err => {
-      console.log("Err: ", err)
-    });
-    // console.log(awa);
+  const placeBet = (chosenOption) => {
+    //makes it a bit more clean, no?
+    const payload = {
+      chosenOption,
+      contract,
+      ethValue,
+      address,
+    };
 
-
+    dispatch(makeABet(payload))
+      .then((res) => {
+        //calling fetch to update state
+        dispatch(fetchUserHistory(payload));
+      })
+      .catch((err) => {
+        console.log("oh no, an error: ", err);
+      });
   };
 
   return (
     <div>
-      <button onClick={() => placeBet()}> Higher </button>
+      <button onClick={() => placeBet(0)}> Higher </button>
       <br />
-      <button onClick={() => placeBet()}> Lower </button>
+      <button onClick={() => placeBet(1)}> Lower </button>
       <br />
       <input
         value={ethValue}

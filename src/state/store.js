@@ -1,6 +1,7 @@
-import { applyMiddleware, createStore } from "redux";
+import { applyMiddleware, combineReducers, createStore } from "redux";
 import thunk from "redux-thunk";
 import { greetingReducer } from "./Greeter/reducers/index";
+import { betReducer } from "./PredictionMarket/reducers";
 
 //init state of the whole  app
 const initState = {
@@ -8,12 +9,10 @@ const initState = {
   greetingValue: "",
   isLoading: true,
   predictionMarket: {
-    latestBet: {},
+    betsHistory: [],
   },
 };
 
-export const store = createStore(
-  greetingReducer,
-  initState,
-  applyMiddleware(thunk)
-);
+const allReducers = combineReducers(greetingReducer, betReducer);
+
+export const store = createStore(betReducer, initState, applyMiddleware(thunk));

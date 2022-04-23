@@ -5,17 +5,19 @@ export const betReducer = (state, action) => {
         ...state,
         predictionMarket: {
           ...state.predictionMarket,
-          latestBet: action.payload,
+          betsHistory: action.payload,
         },
       });
-    case "placeBet":
+    case "fetchUserHistory":
       return (state = {
         ...state,
         predictionMarket: {
           ...state.predictionMarket,
-          latestBet: action.payload,
+          betsHistory: action.payload,
         },
       });
+    case "placeBet":
+      return state;
     default: {
       return { ...state, isLoading: true };
     }

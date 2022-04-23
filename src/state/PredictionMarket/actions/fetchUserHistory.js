@@ -3,16 +3,40 @@ export const fetchUserHistory = (payload) => {
 
   return (dispatch) => {
     payload.contract
-      .getUserTxHistory(payload.address)
-      .then((fetchedValue) => {
-        console.log(fetchedValue, " fected value hostir");
-        dispatch({
-          type: "fetchUserHistory",
-          payload: fetchedValue,
-        });
+      .numberOfBets(payload.address)
+      .then((num) => {
+        console.log("numL ", num);
+
+        //doing this for better error handling on the front end
+        if (num != 0) {
+          payload.contract
+            .getUserTxHistory(payload.address)
+            .then((res) => {
+              //should have initialzed numberOfBets as -1, oops. Oh well.
+
+              console.log("tx history: ", res[num - 1]);
+
+              dispatch({
+                type: "fetchUserHistory",
+                payload: res,
+              });
+            })
+            .catch((err) => {
+              console.log("Err fetching history: ", err);
+            });
+        }
+
+        //dispatching an empty array
+        //saves an API call too
+        else {
+          dispatch({
+            type: "fetchUserHistory",
+            payload: [],
+          });
+        }
       })
       .catch((err) => {
-        console.log("err has occured while fetching the first value", err);
+        console.log("err fetching number of bets: ", err);
       });
   };
 };
