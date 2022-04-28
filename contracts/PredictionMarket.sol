@@ -2,18 +2,26 @@
 pragma solidity ^0.8.0;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import "../contracts/WinnerNFT.sol";
 
 contract PredictionMarket {
-    constructor() {
+
+    constructor (WinnerNFT _winnerNFT){
         owner = msg.sender;
 
+        //assigning address to the instance
+        winnerNFT = _winnerNFT;
+
         //rinkeby network address addded
-        priceFeed = AggregatorV3Interface(
-            0x8A753747A1Fa494EC906cE90E9f37563A8AF630e
-        );
+        priceFeed = AggregatorV3Interface(0x8A753747A1Fa494EC906cE90E9f37563A8AF630e);
+
     }
 
     // DB
+
+    //NFT contract instance
+    WinnerNFT public winnerNFT;
+
     // minimumValue to be deposited
     uint256 public minValueToBeDeposited;
 
@@ -48,27 +56,28 @@ contract PredictionMarket {
     // need this to indicate the balance while the bet is ongoing
     mapping(address => uint256) public playerBalances;
 
-    // array of all players indicating history of players
-    mapping(address => mapping(uint32 => Transaction))
-        public transactionHistory;
 
-    mapping(address => uint32) public numberOfBets;
+    // array of all players indicating history of players
+    mapping(address => mapping(uint32 => Transaction)) public transactionHistory;
+
+    mapping (address => uint32) public numberOfBets;
 
     AggregatorV3Interface internal priceFeed;
 
     //MODIFIERS
     //only owner can call a certain function
-    modifier _onlyOwner() {
+    modifier _onlyOwner(){
         require(msg.sender == owner);
         _;
     }
 
-    // FUNCTIONS
+        // FUNCTIONS
     // deposit for bet
-    function depositForBet(BetType _betType) public payable {
+    function depositForBet(BetType _betType) public payable{
+
         //checking if the money sent is enough
         require(msg.value > minValueToBeDeposited, "is this a joke to you?");
-
+        
         //update the player's balance
         playerBalances[msg.sender] += msg.value;
 
@@ -100,17 +109,24 @@ contract PredictionMarket {
         ++numberOfBets[msg.sender]; // smol gas saver, weeeee
     }
 
-    // get value for checking(chainlink)
-    function getLatestPrice() public view returns (int256) {
+        // get value for checking(chainlink)
+    function getLatestPrice() public view returns (int){
+        
         //latest round data returns a tuple with with multiple values
-        (, int256 price, , , ) = priceFeed.latestRoundData();
+(
+            /*uint80 roundID*/,
+            int price,
+            /*uint startedAt*/,
+            /*uint timeStamp*/,
+            /*uint80 answeredInRound*/
+        ) = priceFeed.latestRoundData();
         return price;
     }
 
     // withdraw from contract(only owner)
 
     //get contract's balance back
-    function getContractBalance() public view returns (uint256) {
+    function getContractBalance() public view returns (uint256){
         return address(this).balance;
     }
 
@@ -119,27 +135,29 @@ contract PredictionMarket {
         minValueToBeDeposited = _value;
     }
 
-    function finalizeBet(uint32 betNumber) public {
+
+    //use reentrancy gauard with this function
+      function finalizeBet(uint32 betNumber) public{
         //get the latest/current tx
         Transaction memory txHolder = transactionHistory[msg.sender][betNumber];
 
         //check if someone's being naughty
-        require(
-            block.timestamp >= txHolder.endingTime,
-            "naughty naughty, you."
-        );
+        require(block.timestamp >= txHolder.endingTime, "naughty naughty, you.");
+
+        //check for trying twice
+        require(txHolder.betResult == BetResult.PENDING, "can't finalize an already finalized tx");
 
         //get the price from chainlink
         uint256 endingPriceForBet = uint256(getLatestPrice());
-
+        
         //assign ending value to the tx
         txHolder.endingValue = endingPriceForBet;
 
         //determine with if
 
         //BULL CASE
-        if (txHolder.betType == BetType.BULL) {
-            if (txHolder.startingValue <= txHolder.endingValue) {
+        if(txHolder.betType == BetType.BULL){
+            if(txHolder.startingValue <= txHolder.endingValue){
                 //update the db
                 txHolder.betResult = BetResult.WON;
             } else {
@@ -150,10 +168,13 @@ contract PredictionMarket {
         }
 
         //BEAR CASE
-        if (txHolder.betType == BetType.BEAR) {
-            if (txHolder.startingValue >= txHolder.endingValue) {
+        if(txHolder.betType == BetType.BEAR){
+            if(txHolder.startingValue >= txHolder.endingValue){
                 //update the db
                 txHolder.betResult = BetResult.WON;
+
+                //give NFT
+                
             } else {
                 //update the db
                 txHolder.betResult = BetResult.LOST;
@@ -163,6 +184,20 @@ contract PredictionMarket {
 
         transactionHistory[msg.sender][betNumber] = txHolder;
 
+        
+        
         //return a message of some sort
+
     }
+
+    function transferNFT() internal {
+
+        //if i send this wihtout an address arg, msg.sender in the NFT contract will be this contract
+        //..because of call being for this.
+        winnerNFT.createNFT(msg.sender);
+    }
+
+
+
+
 }
