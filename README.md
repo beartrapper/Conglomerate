@@ -1,7 +1,5 @@
 <h1>Bi Directional Prediction Market</h1>
 
-<h3>Notes</h3>
-
 <h3>TLDR</h3>
     NFT based emissions give the owners a WIN-WIN situation
 <hr />
