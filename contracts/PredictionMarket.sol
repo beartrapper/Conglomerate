@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "../contracts/WinnerNFT.sol";
@@ -12,13 +12,12 @@ contract PredictionMarket {
         //assigning address to the instance
         winnerNFT = _winnerNFT;
 
-        //rinkeby network address addded
-        priceFeed = AggregatorV3Interface(0x8A753747A1Fa494EC906cE90E9f37563A8AF630e);
+        //bnb testet addy
+        priceFeed = AggregatorV3Interface(0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526);
 
     }
 
     // DB
-
     //NFT contract instance
     WinnerNFT public winnerNFT;
 
@@ -83,8 +82,8 @@ contract PredictionMarket {
 
         //note the tx in db
         Transaction memory currentTx;
-        uint256 startingTimeOfBet = block.timestamp; //using now instead of block.timestamp, the compiler just yelled at me :(
-        uint256 endingtimeOfBet = startingTimeOfBet + 2 minutes;
+        uint256 startingTimeOfBet = block.timestamp; //using block.timestamp instead of now, the compiler just yelled at me :(
+        uint256 endingtimeOfBet = startingTimeOfBet + 16 minutes;
 
         //getting the starting price of the contract
         uint256 startingPriceForBet = uint256(getLatestPrice());
@@ -124,6 +123,9 @@ contract PredictionMarket {
     }
 
     // withdraw from contract(only owner)
+    function withdraw() public _onlyOwner {
+        payable(owner).transfer(getContractBalance());
+    }
 
     //get contract's balance back
     function getContractBalance() public view returns (uint256){
@@ -154,16 +156,21 @@ contract PredictionMarket {
         txHolder.endingValue = endingPriceForBet;
 
         //determine with if
-
         //BULL CASE
         if(txHolder.betType == BetType.BULL){
             if(txHolder.startingValue <= txHolder.endingValue){
                 //update the db
                 txHolder.betResult = BetResult.WON;
+
+                //give NFT
+                transferNFT();
+
+                //transfer the funds back
+                payable(msg.sender).transfer(playerBalances[msg.sender]);
+                
             } else {
                 //update the db
                 txHolder.betResult = BetResult.LOST;
-                playerBalances[msg.sender] = 0;
             }
         }
 
@@ -174,19 +181,21 @@ contract PredictionMarket {
                 txHolder.betResult = BetResult.WON;
 
                 //give NFT
-                
+                transferNFT();
+
+                //transfer the funds back
+                payable(msg.sender).transfer(playerBalances[msg.sender]);
             } else {
                 //update the db
                 txHolder.betResult = BetResult.LOST;
-                playerBalances[msg.sender] = 0;
             }
         }
 
-        transactionHistory[msg.sender][betNumber] = txHolder;
+        //either way, the balance of the player will be reset
+        playerBalances[msg.sender] = 0;
 
-        
-        
-        //return a message of some sort
+        //update the tx values
+        transactionHistory[msg.sender][betNumber] = txHolder;
 
     }
 
